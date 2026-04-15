@@ -1,19 +1,33 @@
 #canvas1 {
-  width: 90%;
-  height: 90%;
+  /* Keep the game at a consistent aspect ratio on any device */
+  width: min(100vw, calc(100vh * 1600 / 700));
+  height: min(100vh, calc(100vw * 700 / 1600));
   border: 2px solid red;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: -2;
   pointer-events: none;
+  image-rendering: pixelated;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   overflow: hidden;
   background-color: gray;
-  zoom: 0.9;
 }
 
 #start {
@@ -27,8 +41,7 @@ body {
 
 .menu-panel {
   position: relative;
-  min-width: 520px;
-  max-width: 90%;
+  width: min(520px, 92vw);
   padding: 40px 48px 56px;
   background:
     radial-gradient(
@@ -562,8 +575,7 @@ body {
 
 .settings-panel {
   position: relative;
-  min-width: 520px;
-  max-width: 90%;
+  width: min(520px, 92vw);
   padding: 40px 48px 56px;
   background:
     radial-gradient(
@@ -791,8 +803,7 @@ body {
 
 .shop-panel {
   position: relative;
-  min-width: 520px;
-  max-width: 90%;
+  width: min(520px, 92vw);
   padding: 40px 48px 56px;
   background:
     radial-gradient(
@@ -879,6 +890,129 @@ body {
     inset 0 0 10px rgba(0, 0, 0, 0.9);
   background-size: cover;
   background-position: center;
+}
+
+.character-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+@media (max-width: 600px) {
+  .menu-panel,
+  .settings-panel,
+  .shop-panel {
+    padding: 22px 18px 26px;
+  }
+
+  #start h1 {
+    font-size: 34px;
+    letter-spacing: 8px;
+    -webkit-text-stroke: 2px #06371a;
+  }
+
+  .menu-subtitle {
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+
+  #play {
+    width: 100%;
+    min-width: 0;
+    font-size: 18px;
+    letter-spacing: 6px;
+    padding: 16px 18px;
+  }
+
+  #mis1 {
+    width: min(520px, 92vw);
+    padding: 14px 14px;
+  }
+
+  #dia {
+    width: min(520px, 92vw);
+    bottom: 90px;
+    font-size: 18px;
+  }
+
+  #coins {
+    top: 12px;
+    right: 12px;
+    width: auto;
+    height: auto;
+    padding: 0;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #coins > p {
+    font-size: 28px;
+    bottom: 0;
+  }
+
+  #timer {
+    top: 12px;
+    right: 12px;
+    padding: 10px 12px;
+    font-size: 18px;
+    letter-spacing: 3px;
+  }
+
+  #timer::after {
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  #settings {
+    top: auto;
+    left: 12px;
+    bottom: 12px;
+    width: 52px;
+    height: 52px;
+  }
+
+  #gameover {
+    padding: 22px;
+  }
+
+  #gameover::before {
+    inset: 70px 18px;
+  }
+
+  #over {
+    font-size: 34px;
+    letter-spacing: 8px;
+    padding: 12px 16px;
+  }
+
+  #retry {
+    width: 100%;
+    font-size: 18px;
+    letter-spacing: 4px;
+    padding: 14px 18px;
+  }
+
+  .shop-characters {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .character-card {
+    width: min(260px, 88vw);
+  }
+
+  #continue,
+  #audio,
+  #shop-close,
+  #shop-open,
+  .buy-btn {
+    width: 100%;
+    min-width: 0;
+    font-size: 15px;
+    letter-spacing: 4px;
+    padding: 14px 16px;
+  }
 }
 
 .character-name {
