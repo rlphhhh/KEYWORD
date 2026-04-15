@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="start">
+      <div class="menu-panel">
+        <h1>KEYWORD</h1>
+        <p class="menu-subtitle">CAN YOU GUESS THE WORD?</p>
+        <div class="menu-content">
+          <p class="menu-text">
+            Talk to the NPC and guess the correct word before time runs out.
+          </p>
+        </div>
+
+        <button id="play" onclick="play()">PLAY</button>
+      </div>
+    </div>
+
+    <div id="shop-overlay">
+      <div class="shop-panel">
+        <h2>SHOP</h2>
+
+        <div class="shop-characters">
+          <div class="character-card">
+            <div class="character-avatar" id="char-1-avatar"><img src="character/lumi.png"></div>
+            <p class="character-name">LUMI</p> 
+            <p class="character-price">10 COINS</p>
+            <button class="buy-btn" onclick="BUY(event)">BUY</button>
+          </div>
+          <div class="character-card">
+            <div class="character-avatar" id="char-2-avatar"><img src="character/kairo.png"></div>
+            <p class="character-name">KAIRO</p>
+            <p class="character-price">10 COINS</p>
+            <button class="buy-btn" onclick="BUY(event)">BUY</button>
+          </div>
+        </div>
+
+        <button id="shop-close" onclick="closeShop()">BACK</button>
+      </div>
+    </div>
+
+    <div id="mission">
+      <div id="mis1">
+        <h1>GUESS THE WORD</h1>
+        <input id="tt" type="text" autofocus />
+        <button id="ans" onclick="ans()">SUBMIT</button>
+      </div>
+    </div>
+
+    <div id="dia">
+      <div id="dia1" onclick="closeD(this)"></div>
+    </div>
+
+    <div id="coins">
+      <img id="cImage" src="/character/coinss.png" />
+      <p id="cText">0</p>
+    </div>
+
+    <p id="timer">180</p>
+
+    <div id="gameover">
+      <p id="over">game over</p>
+      <button id="retry" onclick="closeA()">retry</button>
+    </div>
+
+    <button id="settings" onclick="sett()"></button>
+
+    <div id="sett" onclick="if (event.target.id === 'sett') cont();">
+      <div class="settings-panel" onclick="event.stopPropagation()">
+        <h2>SETTINGS</h2>
+
+        <div class="settings-content">
+          <div class="settings-item">
+            <label>AUDIO</label>
+            <button id="audio" onclick="toggleAudio()">ON</button>
+          </div>
+
+          <div class="settings-item">
+            <label>SHOP</label>
+            <button id="shop-open" onclick="shop()">OPEN</button>
+          </div>
+        </div>
+
+        <button id="continue" onclick="cont()">CONTINUE</button>
+      </div>
+    </div>
+
+    <canvas id="canvas1"></canvas>
+
+    <script src="index.js"></script>
+  </body>
+</html>
