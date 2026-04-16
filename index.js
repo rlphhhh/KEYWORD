@@ -1,7 +1,7 @@
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
-const CANVAS_WIDTH = (canvas.width = 1600);
-const CANVAS_HEIGHT = (canvas.height = 700);
+const CANVAS_WIDTH = (canvas.width = window.innerWidth);
+const CANVAS_HEIGHT = (canvas.height = window.innerHeight);
 let game = document.getElementById("gameover");
 
 let p1 = document.getElementById("start");
@@ -18,9 +18,13 @@ function showGameOver() {
   mis = 0;
 
   // hide mission/dialog UI that might be open
-  parent?.style && ((parent.style.visibility = "hidden"), (parent.style.pointerEvents = "none"));
+  parent?.style &&
+    ((parent.style.visibility = "hidden"),
+    (parent.style.pointerEvents = "none"));
   const diaWrap = document.getElementById("dia");
-  diaWrap?.style && ((diaWrap.style.visibility = "hidden"), (diaWrap.style.pointerEvents = "none"));
+  diaWrap?.style &&
+    ((diaWrap.style.visibility = "hidden"),
+    (diaWrap.style.pointerEvents = "none"));
 
   // show gameover overlay (contains retry button)
   if (game) {
@@ -43,21 +47,34 @@ let playerPos = 0;
 let playerX = 200;
 const playerSpeed = 5;
 const playerWidth = 200;
-const groundY = 450;
+const groundY = CANVAS_HEIGHT * 0.65; // Position player at 65% of canvas height
+let playerY = groundY;
+let jumping = false;
+let jumpVelocity = 0;
+const gravity = 0.6;
+const jumpPower = -15;
 
 const playerImage = new Image();
-playerImage.src = "/character/dawg.png";
+playerImage.src = "character/dawg.png";
+let playerImageLoaded = false;
+playerImage.onload = () => {
+  playerImageLoaded = true;
+};
 const spriteWidth = 575;
 const spriteHeight = 523;
 
 let gameFrame = 0;
-let staggerFrames = 8; // was 5 — slower player animation
+let staggerFrames = 4; // was 5 — slower player animation
 let playerState = "idle";
 
 //npc
 
 const npcImage = new Image();
-npcImage.src = "/character/Larry.png";
+npcImage.src = "character/Larry.png";
+let npcImageLoaded = false;
+npcImage.onload = () => {
+  npcImageLoaded = true;
+};
 const npcWidth = 32;
 const npcHeight = 48;
 let npcFrameX = 0;
@@ -65,12 +82,14 @@ let npcFrameY = 0; // 4th row (depending on your sprite sheet)
 const npcMaxFrame = 4; // how many frames horizontally
 let npcFrameCount = 0;
 const npcStaggerFrames = 12; // was 8 — slower npc animation
-let npcX = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
+let npcX =
+  Math.floor(Math.random() * (CANVAS_WIDTH - CANVAS_WIDTH * 0.3 + 1)) +
+  CANVAS_WIDTH * 0.3;
 
 //coin
 
 const coinImage = new Image();
-coinImage.src = "/character/coins.png";
+coinImage.src = "character/coins.png";
 const coinSheetWidth = 222;
 const coinSheetHeight = 227;
 const coinMaxFrame = 3; // 4 frames total → 0,1,2,3
@@ -80,7 +99,7 @@ let coinFrameX = 0;
 let coinFrameY = 0;
 let coinFrameCount = 0;
 const coinStaggerFrames = 20; // slowed coin animation
-let coinX = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
+let coinX = randomSpawnX([npcX], 800);
 
 const spriteAnimations = [];
 const animationStates = [
@@ -107,24 +126,24 @@ animationStates.forEach((state, index) => {
 
 // Background
 const backgroundLayer1 = new Image();
-backgroundLayer1.src = "/backgrounds/Untitled design.png";
+backgroundLayer1.src = "backgrounds/Untitled design.png";
 const backgroundLayer2 = new Image();
-backgroundLayer2.src = "/backgrounds/ulap.png";
+backgroundLayer2.src = "backgrounds/ulap.png";
 const backgroundLayer3 = new Image();
-backgroundLayer3.src = "/backgrounds/grasss.png";
+backgroundLayer3.src = "backgrounds/grasss.png";
 const backgroundLayer4 = new Image();
-backgroundLayer4.src = "/backgrounds/bato.png";
+backgroundLayer4.src = "backgrounds/bato.png";
 const backgroundLayer5 = new Image();
-backgroundLayer5.src = "/backgrounds/tree.png";
+backgroundLayer5.src = "backgrounds/tree.png";
 const backgroundLayer6 = new Image();
-backgroundLayer6.src = "/backgrounds/sunsun.png";
+backgroundLayer6.src = "backgrounds/sunsun.png";
 
 class Layer {
   constructor(image, speedModifier) {
     this.x = 0;
     this.y = 0;
-    this.width = 1920;
-    this.height = 700;
+    this.width = CANVAS_WIDTH;
+    this.height = CANVAS_HEIGHT;
     this.x2 = this.width;
     this.image = image;
     this.speedModifier = speedModifier;
@@ -167,137 +186,171 @@ const levels = {
     dialogue: "Giving or telling something to others",
     answer: "Share",
     time: 30,
-    npcX: () => Math.floor(Math.random() * 800) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.4) + CANVAS_WIDTH * 0.2,
   },
   2: {
     dialogue: "To look at similarities and differences",
     answer: "Compare",
     time: 25,
-    npcX: () => Math.floor(Math.random() * 700) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.35) + CANVAS_WIDTH * 0.2,
   },
   3: {
     dialogue: "Knowledge or skill gained from doing something",
     answer: "Experience",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 600) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.3) + CANVAS_WIDTH * 0.2,
   },
   4: {
     dialogue: "To arrange things in order",
     answer: "Organize",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 500) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.25) + CANVAS_WIDTH * 0.2,
   },
   5: {
     dialogue: "To show how something works",
     answer: "Demonstrate",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   6: {
     dialogue: "Difficult task or situation that tests your abilites",
-    answer: "Challange",
+    answer: "Challenge",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   7: {
-    dialogue:
-      "to introduce something new or make changes to improve something",
+    dialogue: "to introduce something new or make changes to improve something",
     answer: "Innovate",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   8: {
     dialogue:
       "To make an abstract or genaral idea inferred from specific instances",
     answer: "Concept",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   9: {
-    dialogue:
-      "To successfully complete or reach a goal after a period of time",
+    dialogue: "To successfully complete or reach a goal after a period of time",
     answer: "Achieve",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   10: {
-    dialogue:
-      "A chance to do something useful",
+    dialogue: "A chance to do something useful",
     answer: "Opportunity",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   11: {
-    dialogue:
-      "The achievement of a goal or the positive outcome of an effort",
+    dialogue: "The achievement of a goal or the positive outcome of an effort",
     answer: "Success",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   12: {
     dialogue:
       "To work jointly with others or together especially in an intellectual endeavor",
     answer: "Collaborate",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   13: {
     dialogue:
       "The act, process, or result of making something better, increasing its value, or advancing in quality",
     answer: "Improvement",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   14: {
     dialogue:
       "To make up for a loss, injury, or shortcoming, or to provide payment for work or services",
     answer: "Compensate",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   15: {
     dialogue:
       "To combine multiple ideas, elements, or substances to create a new, complex whole",
     answer: "Synthesize",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   16: {
-    dialogue:
-      "The collecting of information about a particular subject",
+    dialogue: "The collecting of information about a particular subject",
     answer: "Research",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   17: {
     dialogue:
       "To lie in wait in a place of concealment especially for an evil purpose",
     answer: "Lurking",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   18: {
     dialogue:
       "One who advocates or practices activism: a person who uses or supports strong actions (such as public protests) in support of or opposition to one side of a controversial issue",
     answer: "Activists",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   19: {
-    dialogue:
-      "To come together into a group, crowd, or assembly",
+    dialogue: "To come together into a group, crowd, or assembly",
     answer: "Congregate",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
   20: {
     dialogue:
       "To give pleasure, satisfaction, or to indulge a need, desire, or whim",
     answer: "Gratify",
     time: 20,
-    npcX: () => Math.floor(Math.random() * 400) + 300,
+    npcX: () =>
+      Math.floor(Math.random() * CANVAS_WIDTH * 0.2) + CANVAS_WIDTH * 0.2,
   },
 };
+
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function randomSpawnX(excludeXs = [], minDistance = 600) {
+  let x;
+  do {
+    x =
+      Math.floor(Math.random() * (CANVAS_WIDTH * 1.5 - CANVAS_WIDTH + 1)) +
+      CANVAS_WIDTH;
+  } while (excludeXs.some((other) => Math.abs(x - other) < minDistance));
+  return x;
+}
+
+function spawnNpcForLevel(level) {
+  const fn = levels?.[level]?.npcX;
+  if (typeof fn === "function") return fn();
+  return CANVAS_WIDTH * randomBetween(0.55, 0.85);
+}
 
 let dialogueActive = false;
 
@@ -332,25 +385,48 @@ function animate() {
   }
 
   if (gameRun) {
+    if (!jumping) {
+      playerState = "right";
+    }
     // coin animation update
     coinFrameCount++;
     if (coinFrameCount % coinStaggerFrames === 0) {
       coinFrameX = (coinFrameX + 1) % (coinMaxFrame + 1);
     }
 
-    playerState = "right";
-    gameSpeed = 0.6;
-    playerPos += 0.4;
-    npcX -= 2;
-    coinX -= 2;
+    gameSpeed = 2.5;
+    playerPos += 0.6;
+    // Move world objects towards player (increase multiplier if NPC feels too far)
+    const worldMove = gameSpeed * 2.2;
+    npcX -= worldMove;
+    coinX -= worldMove;
   } else {
-    playerState = "idle";
+    if (!jumping) {
+      playerState = "idle";
+    }
     gameSpeed = 0;
   }
 
-  // draw NPC only when on screen
-  if (npcX + 200 >= 0 && npcX <= CANVAS_WIDTH) {
-    c.drawImage(npcImage, npcX, 450, 200, 200);
+  if (jumping) {
+    playerY += jumpVelocity;
+    jumpVelocity += gravity;
+    if (jumpVelocity > 0 && playerState === "jump") {
+      playerState = "jumpd";
+    }
+    if (playerY >= groundY) {
+      playerY = groundY;
+      jumping = false;
+      if (gameRun) {
+        playerState = "right";
+      } else {
+        playerState = "idle";
+      }
+    }
+  }
+
+  // draw NPC only when on screen and loaded
+  if (npcImageLoaded && npcX + 200 >= 0 && npcX <= CANVAS_WIDTH) {
+    c.drawImage(npcImage, npcX, CANVAS_HEIGHT * 0.65, 200, 200);
   }
 
   // draw coin only when on screen
@@ -362,14 +438,14 @@ function animate() {
       coinFrameWidth,
       coinFrameHeight,
       coinX,
-      500,
+      CANVAS_HEIGHT * 0.7,
       200,
-      200
+      200,
     );
   }
 
   // player sprite (skip if completely offscreen)
-  if (playerX + 200 >= 0 && playerX <= CANVAS_WIDTH) {
+  if (playerImageLoaded && playerX + 200 >= 0 && playerX <= CANVAS_WIDTH) {
     const frames = spriteAnimations[playerState];
     const totalFrames = spriteLengths[playerState] || frames.loc.length;
     const position = Math.floor(gameFrame / staggerFrames) % totalFrames;
@@ -382,9 +458,9 @@ function animate() {
       spriteWidth,
       spriteHeight,
       playerX,
-      groundY,
+      playerY,
       200,
-      200
+      200,
     );
   }
 
@@ -393,7 +469,6 @@ function animate() {
 
   checkGame();
 }
-animate();
 
 setInterval(() => {
   if (mis !== 1) return;
@@ -427,7 +502,7 @@ ansBox.addEventListener("input", function () {
     .map((word) =>
       word.length > 0
         ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        : ""
+        : "",
     )
     .join(" ");
   if (formatted !== value) {
@@ -440,9 +515,26 @@ let lastAttackTime = 0;
 
 let hints = 0;
 
+// Score (awarded for correctly answering dialogues/levels)
+let score = 0;
+const scoredLevels = new Set(); // ensures each level only awards once
+const scoreText = document.getElementById("scoreText");
+
+function pointsForDialogueLevel(level) {
+  if (level >= 1 && level <= 5) return 1;
+  if (level >= 6 && level <= 10) return 2;
+  if (level >= 11 && level <= 15) return 5;
+  if (level >= 16 && level <= 20) return 10;
+  return 0;
+}
+
+function updateScoreHud() {
+  if (scoreText) scoreText.textContent = String(score);
+}
+
 function checkGame() {
-  // NPC collision — compare NPC x to the player's on-screen x (playerX)
-  if (!dialogueActive && npcX - 50 <= playerX) {
+  // NPC collision — check for overlap with offset
+  if (!dialogueActive && npcX <= playerX) {
     gameRun = false;
     dialogueActive = true;
 
@@ -458,9 +550,18 @@ function checkGame() {
 
     // keep NPC visible near player while dialog is active
     npcX = playerX + 50;
+
+    // autofocus the answer box
+    ansBox.focus();
+
+    // reset any previous wrong answer styling
+    ansBox.style.border = "";
+    ansBox.style.backgroundColor = "";
+    parent.style.backgroundColor = "";
   }
 
-  // Coin collection — when player passes the coin, add coins and respawn coin
+  // Coin collection — check for overlap with offset
+  // Coin collection — check for overlap with offset
   if (coinX - 50 <= playerX) {
     // award random coin amount (1-5)
     let coinAdd = Math.floor(Math.random() * 5) + 1;
@@ -473,13 +574,21 @@ function checkGame() {
     }
 
     // respawn coin far ahead
-    coinX = Math.floor(Math.random() * (3000 - 1900 + 1)) + 1900;
+    coinX = randomSpawnX([npcX], 800);
   }
 }
 
 document.addEventListener("keydown", function (event) {
   // don't process key input when game is paused/stopped
   if (!gameRun) return;
+
+  if (event.key === " ") {
+    if (!jumping) {
+      jumping = true;
+      jumpVelocity = jumpPower;
+      playerState = "jump";
+    }
+  }
 
   // placeholder for future controls (kept minimal to avoid prior commented-block syntax errors)
   // e.g. if (event.key === "d") { /* move right logic */ }
@@ -533,6 +642,13 @@ function ans() {
       playDing();
     }
 
+    // Award score based on which dialogue (level) was answered correctly
+    if (!scoredLevels.has(currentLevel)) {
+      scoredLevels.add(currentLevel);
+      score += pointsForDialogueLevel(currentLevel);
+      updateScoreHud();
+    }
+
     let coinAdd = Math.floor(Math.random() * 5) + 1;
 
     coins += coinAdd;
@@ -549,8 +665,10 @@ function ans() {
     mis = 0;
     gameRun = true;
 
-    // Move NPC far ahead
-    npcX = Math.floor(Math.random() * (3000 - 1900 + 1)) + 1900;
+    // Move NPC ahead (closer than before so it doesn't take too long)
+    npcX =
+      spawnNpcForLevel(currentLevel + 1) +
+      CANVAS_WIDTH * randomBetween(0.15, 0.35);
 
     // Reset input field
     parent.children[1].value = "";
@@ -562,7 +680,9 @@ function ans() {
 
     return true;
   } else {
-    parent.style.backgroundColor = "green";
+    parent.style.backgroundColor = "rgba(8, 52, 30, 0.97)";
+    ansBox.style.border = "2px solid rgba(86, 255, 141, 0.7)";
+    ansBox.style.backgroundColor = "rgba(12, 58, 34, 0.55)";
     return false;
   }
 }
@@ -600,7 +720,7 @@ function sett() {
   gameSpeed = 0;
   playerState = "idle";
 }
- 
+
 function cont() {
   settInterface.style.visibility = "hidden";
   settInterface.style.pointerEvents = "none";
@@ -632,49 +752,49 @@ function shop() {
   if (shopOverlay) {
     shopOverlay.style.visibility = "visible";
     shopOverlay.style.pointerEvents = "all";
- 
-     // Ensure shop character images fit in their boxes
-     // target images inside the overlay and adjust sizing/boxing
-     const imgs = shopOverlay.querySelectorAll("img, .shop-character");
-     imgs.forEach((img) => {
-       img.style.maxWidth = "100%";
-       img.style.maxHeight = "100%";
-       img.style.objectFit = "contain";
-       img.style.width = "100%";
-       img.style.height = "auto";
-       // ensure parent box centers and hides overflow
-       const p = img.parentElement;
-       if (p) {
-         p.style.overflow = "hidden";
-         p.style.display = "flex";
-         p.style.alignItems = "center";
-         p.style.justifyContent = "center";
-       }
-     });
 
-     // update buy buttons to reflect owned items
-     const buyButtons = shopOverlay.querySelectorAll("[data-item]");
-     buyButtons.forEach((btn) => {
-       const id = btn.dataset.item || btn.id;
-       if (ownedItems.has(id)) {
-         btn.textContent = "Owned";
-         btn.disabled = true;
-         btn.classList.add("owned");
-       }
-     });
-   }
- }
- 
- function closeShop() {
-   if (shopOverlay) {
-     shopOverlay.style.visibility = "hidden";
-     shopOverlay.style.pointerEvents = "none";
-   }
-   // Only resume game if start screen has been removed and the game was running before opening shop
-   if (document.getElementById("start") === null) {
-     gameRun = !!prevGameRun;
-   }
- }
+    // Ensure shop character images fit in their boxes
+    // target images inside the overlay and adjust sizing/boxing
+    const imgs = shopOverlay.querySelectorAll("img, .shop-character");
+    imgs.forEach((img) => {
+      img.style.maxWidth = "100%";
+      img.style.maxHeight = "100%";
+      img.style.objectFit = "contain";
+      img.style.width = "100%";
+      img.style.height = "auto";
+      // ensure parent box centers and hides overflow
+      const p = img.parentElement;
+      if (p) {
+        p.style.overflow = "hidden";
+        p.style.display = "flex";
+        p.style.alignItems = "center";
+        p.style.justifyContent = "center";
+      }
+    });
+
+    // update buy buttons to reflect owned items
+    const buyButtons = shopOverlay.querySelectorAll("[data-item]");
+    buyButtons.forEach((btn) => {
+      const id = btn.dataset.item || btn.id;
+      if (ownedItems.has(id)) {
+        btn.textContent = "Owned";
+        btn.disabled = true;
+        btn.classList.add("owned");
+      }
+    });
+  }
+}
+
+function closeShop() {
+  if (shopOverlay) {
+    shopOverlay.style.visibility = "hidden";
+    shopOverlay.style.pointerEvents = "none";
+  }
+  // Only resume game if start screen has been removed and the game was running before opening shop
+  if (document.getElementById("start") === null) {
+    gameRun = !!prevGameRun;
+  }
+}
 
 function BUY(event) {
   const buyButton = event?.currentTarget;

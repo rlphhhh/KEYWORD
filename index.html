@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>KEYWORD</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
@@ -32,13 +32,17 @@
 
         <div class="shop-characters">
           <div class="character-card">
-            <div class="character-avatar" id="char-1-avatar"><img src="character/lumi.png"></div>
-            <p class="character-name">LUMI</p> 
+            <div class="character-avatar" id="char-1-avatar">
+              <img src="character/lumi.png" />
+            </div>
+            <p class="character-name">LUMI</p>
             <p class="character-price">10 COINS</p>
             <button class="buy-btn" onclick="BUY(event)">BUY</button>
           </div>
           <div class="character-card">
-            <div class="character-avatar" id="char-2-avatar"><img src="character/kairo.png"></div>
+            <div class="character-avatar" id="char-2-avatar">
+              <img src="character/kairo.png" />
+            </div>
             <p class="character-name">KAIRO</p>
             <p class="character-price">10 COINS</p>
             <button class="buy-btn" onclick="BUY(event)">BUY</button>
@@ -62,8 +66,13 @@
     </div>
 
     <div id="coins">
-      <img id="cImage" src="/character/coinss.png" />
+      <img id="cImage" src="character/coinss.png" />
       <p id="cText">0</p>
+    </div>
+
+    <div id="score-hud" aria-label="Score">
+      <div class="score-title">SCORE</div>
+      <div id="scoreText" class="score-value">0</div>
     </div>
 
     <p id="timer">180</p>
