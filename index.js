@@ -683,6 +683,24 @@ function ans() {
     parent.style.backgroundColor = "rgba(8, 52, 30, 0.97)";
     ansBox.style.border = "2px solid rgba(86, 255, 141, 0.7)";
     ansBox.style.backgroundColor = "rgba(12, 58, 34, 0.55)";
+
+    // Show wrong answer indicator - using inline styles instead of class
+    ansBox.style.border = "2px solid rgba(255, 86, 86, 0.8)";
+    ansBox.style.borderBottom = "3px solid rgba(255, 86, 86, 0.8)";
+    ansBox.style.boxShadow =
+      "inset 0 0 18px rgba(0, 0, 0, 0.85), 0 10px 18px rgba(0, 0, 0, 0.35), 0 0 15px rgba(255, 86, 86, 0.5)";
+
+    // Add shake animation
+    ansBox.style.animation = "shake 0.4s ease-in-out";
+
+    setTimeout(() => {
+      // Remove wrong answer styling
+      ansBox.style.border = "";
+      ansBox.style.borderBottom = "";
+      ansBox.style.boxShadow = "";
+      ansBox.style.animation = "";
+    }, 400);
+
     return false;
   }
 }
