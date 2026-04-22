@@ -67,7 +67,7 @@ const spriteWidth = 575;
 const spriteHeight = 523;
 
 let gameFrame = 0;
-let staggerFrames = 2.5; // was 5 — slower player animation
+let staggerFrames = 4; // was 5 — slower player animation
 let playerState = "idle";
 
 //npc
@@ -406,7 +406,7 @@ function animate() {
       coinFrameX = (coinFrameX + 1) % (coinMaxFrame + 1);
     }
 
-    gameSpeed = 4.4;
+    gameSpeed = 2.5;
     playerPos += 0.6;
     // Move world objects towards player (increase multiplier if NPC feels too far)
     const worldMove = gameSpeed * 2.2;
@@ -817,14 +817,24 @@ function shop() {
       }
     });
 
-    // update buy buttons to reflect owned items
+    // update buy buttons to reflect owned items and selection
     const buyButtons = shopOverlay.querySelectorAll("[data-item]");
     buyButtons.forEach((btn) => {
       const id = btn.dataset.item || btn.id;
-      if (ownedItems.has(id)) {
-        btn.textContent = "Owned";
-        btn.disabled = true;
+      if (id === selectedNPC) {
+        btn.textContent = "SELECTED";
+        btn.disabled = false;
         btn.classList.add("owned");
+      } else if (ownedItems.has(id)) {
+        btn.textContent = "Owned";
+        btn.disabled = false;
+        btn.classList.add("owned");
+      } else if (id === "default") {
+        btn.textContent = "SELECT";
+        btn.disabled = false;
+      } else {
+        btn.textContent = "BUY";
+        btn.disabled = false;
       }
     });
   }
@@ -854,13 +864,21 @@ function BUY(event) {
     selectedNPC = itemId;
     updateNPCImage();
 
-    // Update button displays
+    // Update button displays - enable all for re-selection
     const allButtons = document.querySelectorAll(".buy-btn");
     allButtons.forEach((btn) => {
       if (btn.dataset.item === itemId) {
         btn.textContent = "SELECTED";
+        btn.disabled = false;
       } else if (ownedItems.has(btn.dataset.item)) {
         btn.textContent = "Owned";
+        btn.disabled = false;
+      } else if (btn.dataset.item === "default") {
+        btn.textContent = "SELECT";
+        btn.disabled = false;
+      } else {
+        btn.textContent = "BUY";
+        btn.disabled = false;
       }
     });
 
@@ -882,9 +900,25 @@ function BUY(event) {
     ownedItems.add(itemId);
     selectedNPC = itemId; // Set as current NPC
     updateNPCImage(); // Update the NPC image displayed in game
-    buyButton.textContent = "SELECTED";
-    buyButton.disabled = true;
-    buyButton.classList.add("owned");
+    
+    // Update all button displays
+    const allButtons = document.querySelectorAll(".buy-btn");
+    allButtons.forEach((btn) => {
+      if (btn.dataset.item === itemId) {
+        btn.textContent = "SELECTED";
+        btn.disabled = false; // Keep enabled for re-selection
+      } else if (ownedItems.has(btn.dataset.item)) {
+        btn.textContent = "Owned";
+        btn.disabled = false; // Enable for re-selection
+      } else if (btn.dataset.item === "default") {
+        btn.textContent = "SELECT";
+        btn.disabled = false;
+      } else {
+        btn.textContent = "BUY";
+        btn.disabled = false;
+      }
+    });
+    
     saveNPCData();
     alert("Purchased! Character is now selected.");
   } else {
@@ -910,13 +944,21 @@ function SELECT_NPC(event) {
   selectedNPC = itemId;
   updateNPCImage();
 
-  // Update button text to show current selection
+  // Update button text to show current selection - enable all buttons for re-selection
   const allButtons = document.querySelectorAll(".buy-btn");
   allButtons.forEach((btn) => {
     if (btn.dataset.item === itemId) {
       btn.textContent = "SELECTED";
+      btn.disabled = false;
     } else if (ownedItems.has(btn.dataset.item)) {
       btn.textContent = "Owned";
+      btn.disabled = false;
+    } else if (btn.dataset.item === "default") {
+      btn.textContent = "SELECT";
+      btn.disabled = false;
+    } else {
+      btn.textContent = "BUY";
+      btn.disabled = false;
     }
   });
 
@@ -964,18 +1006,24 @@ function loadNPCData() {
         updateNPCImage();
       }
 
-      // Update shop buttons
+      // Update shop buttons - enable all for re-selection
       const buyButtons = document.querySelectorAll(".buy-btn");
       buyButtons.forEach((button) => {
         const itemId = button.dataset.item;
         if (itemId === selectedNPC) {
           button.textContent = "SELECTED";
-          button.disabled = true;
+          button.disabled = false;
           button.classList.add("owned");
         } else if (itemId && ownedItems.has(itemId)) {
           button.textContent = "Owned";
-          button.disabled = true;
+          button.disabled = false;
           button.classList.add("owned");
+        } else if (itemId === "default") {
+          button.textContent = "SELECT";
+          button.disabled = false;
+        } else {
+          button.textContent = "BUY";
+          button.disabled = false;
         }
       });
     } catch (error) {
