@@ -266,7 +266,7 @@ body {
   left: 50%;
   bottom: 200px;
   transform: translateX(-50%);
-  background: linear-gradient(180deg, #1a140f 0%, #0b0907 100%);
+  background: linear-gradient(180deg, #2bc066 0%, #1a7d44 100%);
   color: #efe6c9;
   font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
   font-size: 25px;
@@ -281,12 +281,6 @@ body {
   -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   visibility: hidden;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(transparent 0%, rgba(255, 255, 255, 0.02) 1px);
-  background-size:
-    200px 200px,
-    100% 6px;
   z-index: 3;
 }
 
@@ -710,6 +704,7 @@ body {
 #audio,
 #shop-close,
 #shop-open,
+#save-btn,
 .buy-btn {
   min-width: 200px;
   padding: 16px 32px;
@@ -734,6 +729,7 @@ body {
 #audio:hover,
 #shop-close:hover,
 #shop-open:hover,
+#save-btn:hover,
 .buy-btn:hover {
   transform: translateY(-4px);
   box-shadow:
@@ -746,6 +742,7 @@ body {
 #audio:active,
 #shop-close:active,
 #shop-open:active,
+#save-btn:active,
 .buy-btn:active {
   transform: translateY(2px);
   box-shadow:
@@ -841,7 +838,7 @@ body {
 
 .shop-panel {
   position: relative;
-  width: min(520px, 92vw);
+  width: min(740px, 98vw);
   padding: 40px 48px 56px;
   background:
     radial-gradient(
@@ -890,6 +887,7 @@ body {
 
 .shop-characters {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   gap: 24px;
   justify-content: center;
@@ -898,7 +896,7 @@ body {
 }
 
 .character-card {
-  width: 210px;
+  width: 200px;
   padding: 16px 14px 20px;
   border-radius: 18px;
   border: 3px solid rgba(86, 255, 141, 0.7);
