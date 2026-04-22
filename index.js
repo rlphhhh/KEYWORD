@@ -31,6 +31,9 @@ function showGameOver() {
     game.style.visibility = "visible";
     game.style.pointerEvents = "all";
   }
+
+  // Reset all progress data
+  resetGameProgress();
 }
 
 function play() {
@@ -69,8 +72,17 @@ let playerState = "idle";
 
 //npc
 
+// NPC character mapping
+const npcCharacters = {
+  default: "character/Larry.png",
+  "char-1": "character/lumi.png",
+  "char-2": "character/kairo.png",
+};
+
+let selectedNPC = "default"; // Track which NPC is selected
+
 const npcImage = new Image();
-npcImage.src = "character/Larry.png";
+npcImage.src = npcCharacters[selectedNPC];
 let npcImageLoaded = false;
 npcImage.onload = () => {
   npcImageLoaded = true;
@@ -698,7 +710,6 @@ function ans() {
       ansBox.style.border = "";
       ansBox.style.borderBottom = "";
       ansBox.style.boxShadow = "";
-      ansBox.style.animation = "";
     }, 400);
 
     return false;
@@ -719,9 +730,25 @@ function closeD(btn) {
 }
 
 function closeA() {
+  // Clear saved progress completely when restarting
+  localStorage.removeItem("gameProgress");
   game.remove();
   mis = 0;
   window.location.reload();
+}
+
+// Reset all game progress data
+function resetGameProgress() {
+  coins = 0;
+  currentLevel = 1;
+  time = 180;
+  // Don't clear ownedItems or reset selectedNPC - they persist
+  document.getElementById("scoreText").innerText = "0";
+  coinText.innerHTML = "0";
+  timer.innerHTML = "180";
+  localStorage.removeItem("gameProgress");
+  // Save NPC data before resetting
+  saveNPCData();
 }
 
 let settInterface = document.getElementById("sett");
@@ -823,11 +850,22 @@ function BUY(event) {
 
   // already owned?
   if (ownedItems.has(itemId)) {
-    // ensure UI shows Owned
-    buyButton.textContent = "Owned";
-    buyButton.disabled = true;
-    buyButton.classList.add("owned");
-    alert("Owned");
+    // Set as current NPC
+    selectedNPC = itemId;
+    updateNPCImage();
+
+    // Update button displays
+    const allButtons = document.querySelectorAll(".buy-btn");
+    allButtons.forEach((btn) => {
+      if (btn.dataset.item === itemId) {
+        btn.textContent = "SELECTED";
+      } else if (ownedItems.has(btn.dataset.item)) {
+        btn.textContent = "Owned";
+      }
+    });
+
+    saveNPCData();
+    alert("Character selected!");
     return;
   }
 
@@ -842,13 +880,131 @@ function BUY(event) {
     coins -= PRICE;
     coinText.innerHTML = coins;
     ownedItems.add(itemId);
-    buyButton.textContent = "Owned";
+    selectedNPC = itemId; // Set as current NPC
+    updateNPCImage(); // Update the NPC image displayed in game
+    buyButton.textContent = "SELECTED";
     buyButton.disabled = true;
     buyButton.classList.add("owned");
-    alert("Purchased");
+    saveNPCData();
+    alert("Purchased! Character is now selected.");
   } else {
     alert("Not enough coins");
   }
+}
+
+// Update NPC image based on selected character
+function updateNPCImage() {
+  if (npcCharacters[selectedNPC]) {
+    npcImage.src = npcCharacters[selectedNPC];
+  }
+}
+
+// Select an NPC directly (for owned or default characters)
+function SELECT_NPC(event) {
+  const button = event?.currentTarget;
+  if (!button) return;
+
+  const itemId = button.dataset?.item || "default";
+
+  // Set as current NPC
+  selectedNPC = itemId;
+  updateNPCImage();
+
+  // Update button text to show current selection
+  const allButtons = document.querySelectorAll(".buy-btn");
+  allButtons.forEach((btn) => {
+    if (btn.dataset.item === itemId) {
+      btn.textContent = "SELECTED";
+    } else if (ownedItems.has(btn.dataset.item)) {
+      btn.textContent = "Owned";
+    }
+  });
+
+  saveNPCData();
+  alert("Character selected!");
+}
+
+// Save progress to localStorage
+function saveProgress() {
+  const progressData = {
+    coins: coins,
+    currentLevel: currentLevel,
+    score: parseInt(document.getElementById("scoreText").innerText) || 0,
+    time: time,
+  };
+  localStorage.setItem("gameProgress", JSON.stringify(progressData));
+  saveNPCData(); // Also save NPC data
+  alert("Progress saved!");
+}
+
+// Save NPC data (persists across game resets)
+function saveNPCData() {
+  const npcData = {
+    ownedItems: Array.from(ownedItems),
+    selectedNPC: selectedNPC,
+  };
+  localStorage.setItem("npcData", JSON.stringify(npcData));
+}
+
+// Load NPC data (persists across game resets)
+function loadNPCData() {
+  const savedNPCData = localStorage.getItem("npcData");
+  if (savedNPCData) {
+    try {
+      const npcData = JSON.parse(savedNPCData);
+
+      // Restore owned items
+      if (npcData.ownedItems && Array.isArray(npcData.ownedItems)) {
+        npcData.ownedItems.forEach((itemId) => ownedItems.add(itemId));
+      }
+
+      // Restore selected NPC
+      if (npcData.selectedNPC && npcCharacters[npcData.selectedNPC]) {
+        selectedNPC = npcData.selectedNPC;
+        updateNPCImage();
+      }
+
+      // Update shop buttons
+      const buyButtons = document.querySelectorAll(".buy-btn");
+      buyButtons.forEach((button) => {
+        const itemId = button.dataset.item;
+        if (itemId === selectedNPC) {
+          button.textContent = "SELECTED";
+          button.disabled = true;
+          button.classList.add("owned");
+        } else if (itemId && ownedItems.has(itemId)) {
+          button.textContent = "Owned";
+          button.disabled = true;
+          button.classList.add("owned");
+        }
+      });
+    } catch (error) {
+      console.error("Error loading NPC data:", error);
+    }
+  }
+}
+
+// Load progress from localStorage
+function loadProgress() {
+  const savedData = localStorage.getItem("gameProgress");
+  if (savedData) {
+    try {
+      const progressData = JSON.parse(savedData);
+      coins = progressData.coins || 0;
+      currentLevel = progressData.currentLevel || 1;
+      time = progressData.time || 180;
+
+      // Update UI
+      coinText.innerHTML = coins;
+      document.getElementById("scoreText").innerText = progressData.score || 0;
+      timer.innerHTML = time;
+    } catch (error) {
+      console.error("Error loading progress:", error);
+    }
+  }
+
+  // Load NPC data (owned items and selected NPC) - this persists separately
+  loadNPCData();
 }
 
 /* function playAudio(){
@@ -858,6 +1014,9 @@ function BUY(event) {
 function stopAudio(){
     myMusic.stop()
 } */
+
+// Load saved progress before starting the game
+loadProgress();
 
 // call animate after everything is declared
 animate();
