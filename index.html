@@ -32,12 +32,28 @@
 
         <div class="shop-characters">
           <div class="character-card">
+            <div class="character-avatar" id="char-larry-avatar">
+              <img src="character/Larry.png" />
+            </div>
+            <p class="character-name">LARRY</p>
+            <p class="character-price">FREE</p>
+            <button
+              class="buy-btn"
+              data-item="default"
+              onclick="SELECT_NPC(event)"
+            >
+              SELECT
+            </button>
+          </div>
+          <div class="character-card">
             <div class="character-avatar" id="char-1-avatar">
               <img src="character/lumi.png" />
             </div>
             <p class="character-name">LUMI</p>
             <p class="character-price">10 COINS</p>
-            <button class="buy-btn" onclick="BUY(event)">BUY</button>
+            <button class="buy-btn" data-item="char-1" onclick="BUY(event)">
+              BUY
+            </button>
           </div>
           <div class="character-card">
             <div class="character-avatar" id="char-2-avatar">
@@ -45,7 +61,9 @@
             </div>
             <p class="character-name">KAIRO</p>
             <p class="character-price">10 COINS</p>
-            <button class="buy-btn" onclick="BUY(event)">BUY</button>
+            <button class="buy-btn" data-item="char-2" onclick="BUY(event)">
+              BUY
+            </button>
           </div>
         </div>
 
@@ -97,6 +115,11 @@
           <div class="settings-item">
             <label>SHOP</label>
             <button id="shop-open" onclick="shop()">OPEN</button>
+          </div>
+
+          <div class="settings-item">
+            <label>SAVE</label>
+            <button id="save-btn" onclick="saveProgress()">SAVE</button>
           </div>
         </div>
 
