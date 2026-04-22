@@ -67,7 +67,7 @@ const spriteWidth = 575;
 const spriteHeight = 523;
 
 let gameFrame = 0;
-let staggerFrames = 4; // was 5 — slower player animation
+let staggerFrames = 2.5; // was 5 — slower player animation
 let playerState = "idle";
 
 //npc
@@ -406,7 +406,7 @@ function animate() {
       coinFrameX = (coinFrameX + 1) % (coinMaxFrame + 1);
     }
 
-    gameSpeed = 2.5;
+    gameSpeed = 4.4;
     playerPos += 0.6;
     // Move world objects towards player (increase multiplier if NPC feels too far)
     const worldMove = gameSpeed * 2.2;
