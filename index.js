@@ -526,6 +526,8 @@ let attackCooldown = 5000; // 5 seconds
 let lastAttackTime = 0;
 
 let hints = 0;
+let purchasedHints = 0; // Track hints purchased from shop
+let hintsUsedThisLevel = 0; // Track how many hints used for current level
 
 // Score (awarded for correctly answering dialogues/levels)
 let score = 0;
@@ -557,6 +559,7 @@ function checkGame() {
       dia1.innerHTML = levels[currentLevel].dialogue;
 
       // ✅ set hint ONLY ONCE
+      hintsUsedThisLevel = 0; // Reset for new dialogue
       setHint();
     }
 
@@ -616,16 +619,39 @@ function setHint() {
 
   let word = levels[currentLevel].answer;
   let hint = "";
-
+  
+  // Reveal first letter + one more for each hint used
+  let lettersToReveal = hintsUsedThisLevel + 1;
+  
   for (let i = 0; i < word.length; i++) {
-    if (i === 0 || i === word.length - Math.floor(Math.random() * 5) + 1) {
-      hint += word[i]; // show first and last letter
+    if (i < lettersToReveal) {
+      hint += word[i]; // reveal letters up to the count
     } else {
       hint += " _ ";
     }
   }
 
   ansBox.placeholder = hint;
+}
+
+function useHint() {
+  if (purchasedHints > 0) {
+    purchasedHints--;
+    hintsUsedThisLevel++; // Increment hint usage for this level
+    setHint(); // Reveal one more letter
+    updateHintCounter();
+    saveProgress();
+    showShopNotification("Hint Used!");
+  } else {
+    showShopNotification("No hints available!");
+  }
+}
+
+function updateHintCounter() {
+  const hintCounter = document.getElementById("hint-counter");
+  if (hintCounter) {
+    hintCounter.textContent = purchasedHints;
+  }
 }
 
 let coins = 0;
@@ -687,6 +713,7 @@ function ans() {
 
     // Increment level so next NPC has new dialogue
     currentLevel += 1;
+    hintsUsedThisLevel = 0; // Reset hints for new level
 
     coinText.innerHTML = coins;
 
@@ -742,11 +769,14 @@ function resetGameProgress() {
   coins = 0;
   currentLevel = 1;
   time = 180;
+  purchasedHints = 0;
+  hintsUsedThisLevel = 0;
   // Don't clear ownedItems or reset selectedNPC - they persist
   document.getElementById("scoreText").innerText = "0";
   coinText.innerHTML = "0";
   timer.innerHTML = "180";
   localStorage.removeItem("gameProgress");
+  updateHintCounter();
   // Save NPC data before resetting
   saveNPCData();
 }
@@ -837,6 +867,11 @@ function shop() {
         btn.disabled = false;
       }
     });
+    
+    // Initialize carousels for each tab
+    initializeCarousel("characters");
+    initializeCarousel("hints");
+    initializeCarousel("time");
   }
 }
 
@@ -849,6 +884,334 @@ function closeShop() {
   if (document.getElementById("start") === null) {
     gameRun = !!prevGameRun;
   }
+}
+
+function openBundles() {
+  prevGameRun = gameRun;
+  gameRun = false;
+  const bundlesOverlay = document.getElementById("bundles-overlay");
+  if (bundlesOverlay) {
+    bundlesOverlay.style.visibility = "visible";
+    bundlesOverlay.style.pointerEvents = "all";
+    
+    // Initialize carousel for bundles
+    initializeCarousel("bundles");
+  }
+}
+
+function closeBundles() {
+  const bundlesOverlay = document.getElementById("bundles-overlay");
+  if (bundlesOverlay) {
+    bundlesOverlay.style.visibility = "hidden";
+    bundlesOverlay.style.pointerEvents = "none";
+  }
+  // Only resume game if start screen has been removed and the game was running before opening
+  if (document.getElementById("start") === null) {
+    gameRun = !!prevGameRun;
+  }
+}
+
+function showShopNotification(message) {
+  const overlay = document.getElementById("shop-notification-overlay");
+  const messageEl = document.getElementById("shop-notification-message");
+  
+  if (overlay && messageEl) {
+    messageEl.textContent = message;
+    overlay.classList.add("show");
+  }
+}
+
+function closeShopNotification() {
+  const overlay = document.getElementById("shop-notification-overlay");
+  
+  if (overlay) {
+    overlay.classList.remove("show");
+  }
+}
+
+function switchShopTab(event, tabName) {
+  // Update active tab button
+  const allTabBtns = document.querySelectorAll(".shop-tab-btn");
+  allTabBtns.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  event.currentTarget.classList.add("active");
+
+  // Update active tab content
+  const allTabContents = document.querySelectorAll(".shop-tab-content");
+  allTabContents.forEach((content) => {
+    content.classList.remove("active");
+  });
+  const activeTab = document.getElementById(`${tabName}-tab`);
+  if (activeTab) {
+    activeTab.classList.add("active");
+  }
+  
+  // Initialize carousel for the active tab
+  initializeCarousel(tabName);
+}
+
+// Carousel state tracking
+const carouselState = {};
+
+function initializeCarousel(tabName) {
+  let tab = document.getElementById(`${tabName}-tab`);
+  
+  // For bundles, look for the carousel directly in bundles-overlay
+  if (!tab && tabName === "bundles") {
+    tab = document.getElementById("bundles-overlay");
+  }
+  
+  if (!tab) return;
+  
+  const container = tab.querySelector(".carousel-container");
+  if (!container) return;
+  
+  const track = container.querySelector(".carousel-track");
+  const cards = track.querySelectorAll(".character-card, .powerup-card, .bundle-card");
+  
+  if (!carouselState[tabName]) {
+    carouselState[tabName] = {
+      currentIndex: 0,
+      totalItems: cards.length
+    };
+  }
+  
+  updateCarouselDisplay(tabName);
+}
+
+function carouselSlide(event, direction) {
+  // Find which carousel this button belongs to
+  const container = event.currentTarget.closest(".carousel-container");
+  let tab = container.closest(".shop-tab-content");
+  let tabName = "";
+  
+  if (tab) {
+    const tabId = tab.id;
+    tabName = tabId.replace("-tab", "");
+  } else {
+    // Check if it's in bundles-overlay
+    tab = container.closest("#bundles-overlay");
+    if (tab) {
+      tabName = "bundles";
+    }
+  }
+  
+  if (!tabName) return;
+  
+  const state = carouselState[tabName];
+  if (!state) return;
+  
+  if (direction === "left") {
+    state.currentIndex = (state.currentIndex - 1 + state.totalItems) % state.totalItems;
+  } else if (direction === "right") {
+    state.currentIndex = (state.currentIndex + 1) % state.totalItems;
+  }
+  
+  updateCarouselDisplay(tabName);
+}
+
+function updateCarouselDisplay(tabName) {
+  let tab = document.getElementById(`${tabName}-tab`);
+  
+  // For bundles, look for the carousel directly in bundles-overlay
+  if (!tab && tabName === "bundles") {
+    tab = document.getElementById("bundles-overlay");
+  }
+  
+  if (!tab) return;
+  
+  const container = tab.querySelector(".carousel-container");
+  const track = container.querySelector(".carousel-track");
+  const state = carouselState[tabName];
+  
+  // Update track position
+  const offset = -state.currentIndex * 280;
+  track.style.transform = `translateX(${offset}px)`;
+  
+  // Update indicators
+  const indicatorsContainer = tab.querySelector(".carousel-indicators");
+  const existingIndicators = indicatorsContainer.querySelectorAll(".carousel-indicator");
+  
+  if (existingIndicators.length === 0) {
+    // Create indicators
+    for (let i = 0; i < state.totalItems; i++) {
+      const indicator = document.createElement("div");
+      indicator.className = "carousel-indicator";
+      if (i === state.currentIndex) {
+        indicator.classList.add("active");
+      }
+      indicator.addEventListener("click", () => {
+        state.currentIndex = i;
+        updateCarouselDisplay(tabName);
+      });
+      indicatorsContainer.appendChild(indicator);
+    }
+  } else {
+    // Update existing indicators
+    existingIndicators.forEach((indicator, index) => {
+      if (index === state.currentIndex) {
+        indicator.classList.add("active");
+      } else {
+        indicator.classList.remove("active");
+      }
+    });
+  }
+}
+
+function BUYBOOST(event) {
+  const buyButton = event?.currentTarget;
+  if (!buyButton) return;
+
+  const itemId = buyButton.dataset?.item || buyButton.id || "boost-item";
+
+  buyButton.classList.remove("buy-clicked");
+  void buyButton.offsetWidth;
+  buyButton.classList.add("buy-clicked");
+
+  let price = 0;
+  let message = "";
+  let amount = 0;
+
+  // Determine price and effect based on item
+  if (itemId === "hint") {
+    price = 5;
+    amount = 1;
+    message = "Purchased 1 hint!";
+  } else if (itemId === "hint-2") {
+    price = 8;
+    amount = 2;
+    message = "Purchased 2 hints!";
+  } else if (itemId === "hint-5") {
+    price = 15;
+    amount = 5;
+    message = "Purchased 5 hints!";
+  } else if (itemId === "time-30") {
+    price = 5;
+    amount = 30;
+    message = "Added 30 seconds!";
+  } else if (itemId === "time-60") {
+    price = 10;
+    amount = 60;
+    message = "Added 60 seconds!";
+  } else if (itemId === "time-120") {
+    price = 18;
+    amount = 120;
+    message = "Added 120 seconds!";
+  }
+
+  if (coins >= price) {
+    coins -= price;
+    coinText.innerHTML = coins;
+
+    if (itemId.includes("hint")) {
+      purchasedHints += amount;
+      updateHintCounter();
+    } else if (itemId.includes("time")) {
+      time += amount;
+      timer.innerHTML = time;
+    }
+
+    saveProgress();
+    showShopNotification(message);
+  } else {
+    showShopNotification("Not enough coins");
+  }
+}
+
+// Track purchased bundles and their expiry
+let purchasedBundles = JSON.parse(localStorage.getItem("purchasedBundles") || "{}");
+
+// Helper to get expiry timestamp for a bundle
+function getBundleExpiry(itemId) {
+  if (purchasedBundles[itemId]) {
+    return purchasedBundles[itemId].expiry;
+  }
+  return 0;
+}
+
+// Helper to get bundle span in ms
+function getBundleSpanMs(itemId) {
+  if (itemId === "bundle-49") return 7 * 24 * 60 * 60 * 1000; // 1 week
+  if (itemId === "bundle-199") return 30 * 24 * 60 * 60 * 1000; // 1 month
+  if (itemId === "bundle-499") return 365 * 24 * 60 * 60 * 1000; // 1 year
+  return 0;
+}
+
+// Check if any bundle is currently active
+function getActiveBundleInfo() {
+  const now = Date.now();
+  for (let bundleId in purchasedBundles) {
+    if (purchasedBundles[bundleId].expiry && purchasedBundles[bundleId].expiry > now) {
+      return { bundleId, expiry: purchasedBundles[bundleId].expiry };
+    }
+  }
+  return null;
+}
+
+function BUYBUNDLE(event) {
+  const buyButton = event?.currentTarget;
+  if (!buyButton) return;
+
+  const itemId = buyButton.dataset?.item || buyButton.id || "bundle-item";
+
+  buyButton.classList.remove("buy-clicked");
+  void buyButton.offsetWidth;
+  buyButton.classList.add("buy-clicked");
+
+  // Check if ANY bundle is currently active
+  const now = Date.now();
+  const activeBundle = getActiveBundleInfo();
+  if (activeBundle) {
+    // Show popup: can't buy another while one is active
+    const remaining = activeBundle.expiry - now;
+    let days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+    let hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    let mins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+    let msg = `You can't buy another bundle until your current one expires.\nTime left: `;
+    if (days > 0) msg += `${days}d `;
+    if (hours > 0) msg += `${hours}h `;
+    if (mins > 0) msg += `${mins}m`;
+    showShopNotification(msg);
+    return;
+  }
+
+  let price = 0;
+  let message = "";
+  let hintsAmount = 0;
+  let timeAmount = 0;
+  let spanMs = getBundleSpanMs(itemId);
+
+  // Determine bundle details based on item
+  if (itemId === "bundle-49") {
+    price = 49; // test: use coins
+    hintsAmount = 10;
+    timeAmount = 60;
+    message = "Starter Pack Purchased! +10 Hints, +60 Seconds";
+  } else if (itemId === "bundle-199") {
+    price = 199;
+    hintsAmount = 25;
+    timeAmount = 120;
+    message = "Pro Pack Purchased! +25 Hints, +120 Seconds";
+  } else if (itemId === "bundle-499") {
+    price = 499;
+    hintsAmount = 40;
+    timeAmount = 360;
+    message = "Ultimate Pack Purchased! +40 Hints, +360 Seconds";
+  }
+
+  // No coin check for bundles (test mode)
+  purchasedHints += hintsAmount;
+  time += timeAmount;
+  timer.innerHTML = time;
+
+  // Mark bundle as purchased with expiry
+  purchasedBundles[itemId] = { expiry: now + spanMs };
+  localStorage.setItem("purchasedBundles", JSON.stringify(purchasedBundles));
+
+  saveProgress();
+  showShopNotification(message);
+  updateHintCounter();
 }
 
 function BUY(event) {
@@ -879,7 +1242,7 @@ function BUY(event) {
     });
 
     saveNPCData();
-    alert("Character selected!");
+    showShopNotification("Character selected!");
     closeShop();
 
     if (document.getElementById("start") === null) {
@@ -918,14 +1281,14 @@ function BUY(event) {
     });
 
     saveNPCData();
-    alert("Purchased! Character is now selected.");
+    showShopNotification("Purchased! Character is now selected.");
     closeShop();
 
     if (document.getElementById("start") === null) {
       gameRun = true;
     }
   } else {
-    alert("Not enough coins");
+    showShopNotification("Not enough coins");
   }
 }
 
@@ -966,7 +1329,7 @@ function SELECT_NPC(event) {
   });
 
   saveNPCData();
-  alert("Character selected!");
+  showShopNotification("Character selected!");
   closeShop();
 
   // Always resume the game if the start screen is gone
@@ -982,10 +1345,11 @@ function saveProgress() {
     currentLevel: currentLevel,
     score: parseInt(document.getElementById("scoreText").innerText) || 0,
     time: time,
+    purchasedHints: purchasedHints,
   };
   localStorage.setItem("gameProgress", JSON.stringify(progressData));
   saveNPCData(); // Also save NPC data
-  alert("Progress saved!");
+  showShopNotification("Progress saved!");
 }
 
 // Save NPC data (persists across game resets)
@@ -1051,6 +1415,7 @@ function loadProgress() {
       currentLevel = progressData.currentLevel || 1;
       time = progressData.time || 180;
       score = progressData.score || 0;
+      purchasedHints = progressData.purchasedHints || 0;
 
       // Update UI
       coinText.innerHTML = coins;
@@ -1075,7 +1440,7 @@ function stopAudio(){
 
 // Load saved progress before starting the game
 loadProgress();
+updateHintCounter();
 
 // call animate after everything is declared
 animate();
-
