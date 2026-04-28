@@ -1,79 +1,209 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KEYWORD</title>
-    <link rel="icon" type="image/png" href="backgrounds/logo2.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-      rel="stylesheet"
-    />
-    <link href="style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="start">
-      <div class="menu-panel">
-        <h1>KEYWORD</h1>
-        <p class="menu-subtitle">CAN YOU GUESS THE WORD?</p>
-        <div class="menu-content">
-          <p class="menu-text">
-            Talk to the NPC and guess the correct word before time runs out.
-          </p>
-        </div>
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>KEYWORD</title>
+      <link rel="icon" type="image/png" href="backgrounds/logo2.png">
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+        rel="stylesheet"
+      />
+      <link href="style.css" rel="stylesheet" />
+    </head>
+    <body>
+      <div id="start">
+        <div class="menu-panel">
+          <h1>KEYWORD</h1>
+          <p class="menu-subtitle">CAN YOU GUESS THE WORD?</p>
+          <div class="menu-content">
+            <p class="menu-text">
+              Talk to the NPC and guess the correct word before time runs out.
+            </p>
+          </div>
 
-        <button id="play" onclick="play()">PLAY</button>
+          <button id="play" onclick="play()">PLAY</button>
+        </div>
       </div>
-    </div>
 
-    <div id="shop-overlay">
-      <div class="shop-panel">
-        <h2>SHOP</h2>
+      <div id="shop-overlay">
+        <div class="shop-panel">
+          <h2>SHOP</h2>
 
-        <div class="shop-tabs">
-          <button class="shop-tab-btn active" onclick="switchShopTab(event, 'characters')">CHARACTERS</button>
-          <button class="shop-tab-btn" onclick="switchShopTab(event, 'hints')">HINTS</button>
-          <button class="shop-tab-btn" onclick="switchShopTab(event, 'time')">TIME</button>
-        </div>
+          <div class="shop-tabs">
+            <button class="shop-tab-btn active" onclick="switchShopTab(event, 'characters')">CHARACTERS</button>
+            <button class="shop-tab-btn" onclick="switchShopTab(event, 'hints')">HINTS</button>
+            <button class="shop-tab-btn" onclick="switchShopTab(event, 'time')">TIME</button>
+          </div>
 
-        <!-- CHARACTERS TAB -->
-        <div id="characters-tab" class="shop-tab-content active">
-          <div class="carousel-container" data-carousel="characters">
-            <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
-            <div class="carousel-viewport">
-              <div class="shop-characters carousel-track">
-                <div class="character-card">
-                  <div class="character-avatar" id="char-larry-avatar">
-                    <img src="character/Larry.png" />
+          <!-- CHARACTERS TAB -->
+          <div id="characters-tab" class="shop-tab-content active">
+            <div class="carousel-container" data-carousel="characters">
+              <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
+              <div class="carousel-viewport">
+                <div class="shop-characters carousel-track">
+                  <div class="character-card">
+                    <div class="character-avatar" id="char-larry-avatar">
+                      <img src="character/Larry.png" />
+                    </div>
+                    <p class="character-name">LARRY</p>
+                    <p class="character-price">FREE</p>
+                    <button
+                      class="buy-btn"
+                      data-item="default"
+                      onclick="SELECT_NPC(event)"
+                    >
+                      SELECT
+                    </button>
                   </div>
-                  <p class="character-name">LARRY</p>
-                  <p class="character-price">FREE</p>
-                  <button
-                    class="buy-btn"
-                    data-item="default"
-                    onclick="SELECT_NPC(event)"
-                  >
-                    SELECT
-                  </button>
+                  <div class="character-card">
+                    <div class="character-avatar" id="char-1-avatar">
+                      <img src="character/lumi.png" />
+                    </div>
+                    <p class="character-name">LUMI</p>
+                    <p class="character-price">10 COINS</p>
+                    <button class="buy-btn" data-item="char-1" onclick="BUY(event)">
+                      BUY
+                    </button>
+                  </div>
+                  <div class="character-card">
+                    <div class="character-avatar" id="char-2-avatar">
+                      <img src="character/kairo.png" />
+                    </div>
+                    <p class="character-name">KAIRO</p>
+                    <p class="character-price">10 COINS</p>
+                    <button class="buy-btn" data-item="char-2" onclick="BUY(event)">
+                      BUY
+                    </button>
+                  </div>
                 </div>
-                <div class="character-card">
-                  <div class="character-avatar" id="char-1-avatar">
-                    <img src="character/lumi.png" />
+              </div>
+              <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
+            </div>
+            <div class="carousel-indicators characters-indicators"></div>
+          </div>
+
+          <!-- HINTS TAB -->
+          <div id="hints-tab" class="shop-tab-content">
+            <div class="carousel-container" data-carousel="hints">
+              <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
+              <div class="carousel-viewport">
+                <div class="shop-powerups carousel-track">
+                  <div class="powerup-card">
+                    <p class="powerup-name">HINT</p>
+                    <p class="powerup-description">Reveal a letter</p>
+                    <p class="powerup-price">5 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="hint" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
                   </div>
-                  <p class="character-name">LUMI</p>
-                  <p class="character-price">10 COINS</p>
-                  <button class="buy-btn" data-item="char-1" onclick="BUY(event)">
+                  <div class="powerup-card">
+                    <p class="powerup-name">2X HINTS</p>
+                    <p class="powerup-description">Get 2 hints</p>
+                    <p class="powerup-price">8 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="hint-2" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
+                  </div>
+                  <div class="powerup-card">
+                    <p class="powerup-name">HINT PACK</p>
+                    <p class="powerup-description">Get 5 hints</p>
+                    <p class="powerup-price">15 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="hint-5" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
+            </div>
+            <div class="carousel-indicators hints-indicators"></div>
+          </div>
+
+          <!-- TIME TAB -->
+          <div id="time-tab" class="shop-tab-content">
+            <div class="carousel-container" data-carousel="time">
+              <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
+              <div class="carousel-viewport">
+                <div class="shop-powerups carousel-track">
+                  <div class="powerup-card">
+                    <p class="powerup-name">+30 SECONDS</p>
+                    <p class="powerup-description">Add 30 seconds</p>
+                    <p class="powerup-price">5 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="time-30" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
+                  </div>
+                  <div class="powerup-card">
+                    <p class="powerup-name">+60 SECONDS</p>
+                    <p class="powerup-description">Add 60 seconds</p>
+                    <p class="powerup-price">10 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="time-60" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
+                  </div>
+                  <div class="powerup-card">
+                    <p class="powerup-name">+120 SECONDS</p>
+                    <p class="powerup-description">Add 120 seconds</p>
+                    <p class="powerup-price">18 COINS</p>
+                    <button class="buy-btn powerup-btn" data-item="time-120" onclick="BUYBOOST(event)">
+                      BUY
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
+            </div>
+            <div class="carousel-indicators time-indicators"></div>
+          </div>
+
+          <button id="shop-close" onclick="closeShop()">BACK</button>
+        </div>
+      </div>
+
+      <!-- BUNDLES OVERLAY -->
+      <div id="bundles-overlay">
+        <div class="bundles-panel">
+          <h2>BUNDLES</h2>
+
+          <div class="carousel-container" data-carousel="bundles">
+            <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
+            <div class="carousel-viewport bundles-viewport">
+              <div class="shop-bundles carousel-track">
+                <div class="bundle-card">
+                  <p class="bundle-title">STARTER PACK</p>
+                  <p class="bundle-price">₱49</p>
+                  <div class="bundle-features">
+                    <p>Daily No Ads</p>
+                    <p>10 Hints</p>
+                    <p>+60 Seconds</p>
+                  </div>
+                  <button class="buy-btn bundle-btn" data-item="bundle-49" onclick="BUYBUNDLE(event)">
                     BUY
                   </button>
                 </div>
-                <div class="character-card">
-                  <div class="character-avatar" id="char-2-avatar">
-                    <img src="character/kairo.png" />
+                <div class="bundle-card">
+                  <p class="bundle-title">PRO PACK</p>
+                  <p class="bundle-price">₱199</p>
+                  <div class="bundle-features">
+                    <p>Weekly No Ads</p>
+                    <p>25 Hints</p>
+                    <p>+120 Seconds</p>
                   </div>
-                  <p class="character-name">KAIRO</p>
-                  <p class="character-price">10 COINS</p>
-                  <button class="buy-btn" data-item="char-2" onclick="BUY(event)">
+                  <button class="buy-btn bundle-btn" data-item="bundle-199" onclick="BUYBUNDLE(event)">
+                    BUY
+                  </button>
+                </div>
+                <div class="bundle-card">
+                  <p class="bundle-title">ULTIMATE PACK</p>
+                  <p class="bundle-price">₱499</p>
+                  <div class="bundle-features">
+                    <p>Monthly No Ads</p>
+                    <p>40 Hints</p>
+                    <p>+360 Seconds</p>
+                  </div>
+                  <button class="buy-btn bundle-btn" data-item="bundle-499" onclick="BUYBUNDLE(event)">
                     BUY
                   </button>
                 </div>
@@ -81,217 +211,87 @@
             </div>
             <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
           </div>
-          <div class="carousel-indicators characters-indicators"></div>
-        </div>
+          <div class="carousel-indicators bundles-indicators"></div>
 
-        <!-- HINTS TAB -->
-        <div id="hints-tab" class="shop-tab-content">
-          <div class="carousel-container" data-carousel="hints">
-            <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
-            <div class="carousel-viewport">
-              <div class="shop-powerups carousel-track">
-                <div class="powerup-card">
-                  <p class="powerup-name">HINT</p>
-                  <p class="powerup-description">Reveal a letter</p>
-                  <p class="powerup-price">5 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="hint" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-                <div class="powerup-card">
-                  <p class="powerup-name">2X HINTS</p>
-                  <p class="powerup-description">Get 2 hints</p>
-                  <p class="powerup-price">8 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="hint-2" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-                <div class="powerup-card">
-                  <p class="powerup-name">HINT PACK</p>
-                  <p class="powerup-description">Get 5 hints</p>
-                  <p class="powerup-price">15 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="hint-5" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-              </div>
-            </div>
-            <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
-          </div>
-          <div class="carousel-indicators hints-indicators"></div>
+          <button id="bundles-close" onclick="closeBundles()">BACK</button>
         </div>
-
-        <!-- TIME TAB -->
-        <div id="time-tab" class="shop-tab-content">
-          <div class="carousel-container" data-carousel="time">
-            <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
-            <div class="carousel-viewport">
-              <div class="shop-powerups carousel-track">
-                <div class="powerup-card">
-                  <p class="powerup-name">+30 SECONDS</p>
-                  <p class="powerup-description">Add 30 seconds</p>
-                  <p class="powerup-price">5 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="time-30" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-                <div class="powerup-card">
-                  <p class="powerup-name">+60 SECONDS</p>
-                  <p class="powerup-description">Add 60 seconds</p>
-                  <p class="powerup-price">10 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="time-60" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-                <div class="powerup-card">
-                  <p class="powerup-name">+120 SECONDS</p>
-                  <p class="powerup-description">Add 120 seconds</p>
-                  <p class="powerup-price">18 COINS</p>
-                  <button class="buy-btn powerup-btn" data-item="time-120" onclick="BUYBOOST(event)">
-                    BUY
-                  </button>
-                </div>
-              </div>
-            </div>
-            <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
-          </div>
-          <div class="carousel-indicators time-indicators"></div>
-        </div>
-
-        <button id="shop-close" onclick="closeShop()">BACK</button>
       </div>
-    </div>
 
-    <!-- BUNDLES OVERLAY -->
-    <div id="bundles-overlay">
-      <div class="bundles-panel">
-        <h2>BUNDLES</h2>
+      <div id="mission">
+        <div id="mis1">
+          <h1>GUESS THE WORD</h1>
+          <input id="tt" type="text" autofocus />
+          <div class="mission-buttons">
+            <button id="hint-btn" onclick="useHint()">
+              HINT <span id="hint-counter">0</span>
+            </button>
+            <button id="ans" onclick="ans()">SUBMIT</button>
+          </div>
+        </div>
+      </div>
 
-        <div class="carousel-container" data-carousel="bundles">
-          <button class="carousel-btn carousel-left" onclick="carouselSlide(event, 'left')"><</button>
-          <div class="carousel-viewport bundles-viewport">
-            <div class="shop-bundles carousel-track">
-              <div class="bundle-card">
-                <p class="bundle-title">STARTER PACK</p>
-                <p class="bundle-price">₱49</p>
-                <div class="bundle-features">
-                  <p>1 Week No Ads</p>
-                  <p>10 Hints</p>
-                  <p>+60 Seconds</p>
-                </div>
-                <button class="buy-btn bundle-btn" data-item="bundle-49" onclick="BUYBUNDLE(event)">
-                  BUY
-                </button>
-              </div>
-              <div class="bundle-card">
-                <p class="bundle-title">PRO PACK</p>
-                <p class="bundle-price">₱199</p>
-                <div class="bundle-features">
-                  <p>1 Month No Ads</p>
-                  <p>25 Hints</p>
-                  <p>+120 Seconds</p>
-                </div>
-                <button class="buy-btn bundle-btn" data-item="bundle-199" onclick="BUYBUNDLE(event)">
-                  BUY
-                </button>
-              </div>
-              <div class="bundle-card">
-                <p class="bundle-title">ULTIMATE PACK</p>
-                <p class="bundle-price">₱499</p>
-                <div class="bundle-features">
-                  <p>1 Year No Ads</p>
-                  <p>40 Hints</p>
-                  <p>+360 Seconds</p>
-                </div>
-                <button class="buy-btn bundle-btn" data-item="bundle-499" onclick="BUYBUNDLE(event)">
-                  BUY
-                </button>
-              </div>
+      <div id="dia">
+        <div id="dia1" onclick="closeD(this)"></div>
+      </div>
+
+      <div id="coins">
+        <img id="cImage" src="character/coinss.png" />
+        <p id="cText">0</p>
+      </div>
+
+      <div id="score-hud" aria-label="Score">
+        <div class="score-title">SCORE</div>
+        <div id="scoreText" class="score-value">0</div>
+      </div>
+
+      <p id="timer">180</p>
+
+      <div id="gameover">
+        <p id="over">game over</p>
+        <button id="retry" onclick="closeA()">retry</button>
+      </div>
+
+      <div id="shop-notification-overlay">
+        <div class="shop-notification-panel">
+          <p id="shop-notification-message"></p>
+          <button onclick="closeShopNotification()">OK</button>
+        </div>
+      </div>
+
+      <button id="settings" onclick="sett()"></button>
+
+      <div id="sett" onclick="if (event.target.id === 'sett') cont();">
+        <div class="settings-panel" onclick="event.stopPropagation()">
+          <h2>SETTINGS</h2>
+
+          <div class="settings-content">
+            <div class="settings-item">
+              <label>AUDIO</label>
+              <button id="audio" onclick="toggleAudio()">ON</button>
+            </div>
+
+            <div class="settings-item">
+              <label>SHOP</label>
+              <button id="shop-open" onclick="shop()">OPEN</button>
+            </div>
+
+            <div class="settings-item">
+              <label>BUNDLES</label>
+              <button id="bundles-open" onclick="openBundles()">OPEN</button>
+            </div>
+
+            <div class="settings-item">
+              <label>SAVE</label>
+              <button id="save-btn" onclick="saveProgress()">SAVE</button>
             </div>
           </div>
-          <button class="carousel-btn carousel-right" onclick="carouselSlide(event, 'right')">></button>
-        </div>
-        <div class="carousel-indicators bundles-indicators"></div>
 
-        <button id="bundles-close" onclick="closeBundles()">BACK</button>
-      </div>
-    </div>
-
-    <div id="mission">
-      <div id="mis1">
-        <h1>GUESS THE WORD</h1>
-        <input id="tt" type="text" autofocus />
-        <div class="mission-buttons">
-          <button id="hint-btn" onclick="useHint()">
-            HINT <span id="hint-counter">0</span>
-          </button>
-          <button id="ans" onclick="ans()">SUBMIT</button>
+          <button id="continue" onclick="cont()">CONTINUE</button>
         </div>
       </div>
-    </div>
 
-    <div id="dia">
-      <div id="dia1" onclick="closeD(this)"></div>
-    </div>
+      <canvas id="canvas1"></canvas>
 
-    <div id="coins">
-      <img id="cImage" src="character/coinss.png" />
-      <p id="cText">0</p>
-    </div>
-
-    <div id="score-hud" aria-label="Score">
-      <div class="score-title">SCORE</div>
-      <div id="scoreText" class="score-value">0</div>
-    </div>
-
-    <p id="timer">180</p>
-
-    <div id="gameover">
-      <p id="over">game over</p>
-      <button id="retry" onclick="closeA()">retry</button>
-    </div>
-
-    <div id="shop-notification-overlay">
-      <div class="shop-notification-panel">
-        <p id="shop-notification-message"></p>
-        <button onclick="closeShopNotification()">OK</button>
-      </div>
-    </div>
-
-    <button id="settings" onclick="sett()"></button>
-
-    <div id="sett" onclick="if (event.target.id === 'sett') cont();">
-      <div class="settings-panel" onclick="event.stopPropagation()">
-        <h2>SETTINGS</h2>
-
-        <div class="settings-content">
-          <div class="settings-item">
-            <label>AUDIO</label>
-            <button id="audio" onclick="toggleAudio()">ON</button>
-          </div>
-
-          <div class="settings-item">
-            <label>SHOP</label>
-            <button id="shop-open" onclick="shop()">OPEN</button>
-          </div>
-
-          <div class="settings-item">
-            <label>BUNDLES</label>
-            <button id="bundles-open" onclick="openBundles()">OPEN</button>
-          </div>
-
-          <div class="settings-item">
-            <label>SAVE</label>
-            <button id="save-btn" onclick="saveProgress()">SAVE</button>
-          </div>
-        </div>
-
-        <button id="continue" onclick="cont()">CONTINUE</button>
-      </div>
-    </div>
-
-    <canvas id="canvas1"></canvas>
-
-    <script src="index.js"></script>
-  </body>
-</html>
+      <script src="index.js"></script>
+    </body>
+  </html>
