@@ -257,6 +257,43 @@ body {
     inset 0 0 10px rgba(255, 255, 255, 0.25);
 }
 
+.mission-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.mission-buttons button {
+  position: relative;
+}
+
+#hint-btn {
+  background: linear-gradient(120deg, #ffd88a, #ffed4e) !important;
+  color: #333 !important;
+  -webkit-text-stroke: 1px rgba(51, 51, 51, 0.2) !important;
+}
+
+#hint-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 14px rgba(255, 255, 255, 0.35) !important;
+}
+
+#hint-counter {
+  display: inline-block;
+  min-width: 20px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+}
+
 #dia {
   width: 520px;
   max-width: min(86vw, 720px);
@@ -700,6 +737,7 @@ body {
 }
 
 /* SETTINGS / SHOP BUTTONS */
+#bundles-open,
 #continue,
 #audio,
 #shop-close,
@@ -892,7 +930,7 @@ body {
   gap: 24px;
   justify-content: center;
   margin-bottom: 32px;
-  margin-top: 8px;
+  margin-top: 35px;
 }
 
 .character-card {
@@ -905,9 +943,6 @@ body {
     rgba(86, 255, 141, 0.2),
     rgba(3, 20, 11, 0.98)
   );
-  box-shadow:
-    0 18px 30px rgba(0, 0, 0, 0.85),
-    inset 0 0 18px rgba(0, 0, 0, 0.9);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1057,6 +1092,44 @@ body {
     width: min(260px, 88vw);
   }
 
+  .shop-tabs {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .shop-tab-btn {
+    padding: 8px 14px;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .shop-powerups {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .powerup-card {
+    width: min(260px, 88vw);
+  }
+
+  .shop-bundles {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bundle-card {
+    width: min(280px, 90vw);
+  }
+
+  .mission-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mission-buttons button {
+    width: 100%;
+  }
+
   #continue,
   #audio,
   #shop-close,
@@ -1083,4 +1156,576 @@ body {
   font-size: 10px;
   letter-spacing: 2px;
   color: #ffd88a;
+}
+
+/* SHOP NOTIFICATION POPUP */
+#shop-notification-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 19;
+  visibility: hidden;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(2, 7, 4, 0.85),
+    rgba(0, 0, 0, 0.95)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#shop-notification-overlay.show {
+  visibility: visible;
+  pointer-events: all;
+  opacity: 1;
+}
+
+.shop-notification-panel {
+  position: relative;
+  width: min(450px, 90vw);
+  padding: 32px 40px;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(86, 255, 141, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 100%,
+      rgba(9, 66, 33, 0.85),
+      rgba(1, 7, 3, 0.96)
+    );
+  border-radius: 22px;
+  border: 3px solid rgba(86, 255, 141, 0.45);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.9),
+    inset 0 0 26px rgba(0, 0, 0, 0.85);
+  text-align: center;
+  z-index: 1;
+  pointer-events: all;
+  animation: popupSlide 0.3s ease-out;
+}
+
+.shop-notification-panel::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(157, 255, 196, 0.35);
+  box-shadow: 0 0 30px rgba(86, 255, 141, 0.35);
+  pointer-events: none;
+}
+
+#shop-notification-message {
+  margin: 0 0 24px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: #f1ffee;
+  -webkit-text-stroke: 1px #06371a;
+  text-shadow:
+    0 0 12px rgba(0, 0, 0, 0.85),
+    0 0 10px rgba(86, 255, 141, 0.6);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.shop-notification-panel button {
+  min-width: 180px;
+  padding: 14px 32px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #2bc066, #6bff9b);
+  color: #052712;
+  border: 3px solid #0b341b;
+  border-radius: 16px;
+  box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.65),
+    inset 0 0 14px rgba(255, 255, 255, 0.35);
+  -webkit-text-stroke: 1.5px rgba(3, 48, 24, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shop-notification-panel button:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 24px 42px rgba(0, 0, 0, 0.75),
+    inset 0 0 16px rgba(255, 255, 255, 0.45);
+}
+
+.shop-notification-panel button:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.8),
+    inset 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes popupSlide {
+  from {
+    transform: scale(0.8) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* SHOP TABS */
+.shop-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.shop-tab-btn {
+  padding: 10px 20px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(43, 192, 102, 0.2);
+  color: #8dffba;
+  border: 2px solid rgba(86, 255, 141, 0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shop-tab-btn:hover {
+  background: rgba(43, 192, 102, 0.4);
+  border-color: rgba(86, 255, 141, 0.7);
+  color: #f1ffee;
+}
+
+.shop-tab-btn.active {
+  background: linear-gradient(120deg, #2bc066, #6bff9b);
+  color: #052712;
+  border-color: #0b341b;
+  box-shadow:
+    0 0 12px rgba(86, 255, 141, 0.6),
+    inset 0 0 8px rgba(255, 255, 255, 0.2);
+  -webkit-text-stroke: 1px rgba(3, 48, 24, 0.3);
+}
+
+.shop-tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.shop-tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* POWERUP SHOP ITEMS */
+.shop-powerups {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 28px;
+  margin-top: 100px;
+}
+
+.powerup-card {
+  width: 200px;
+  padding: 16px 14px 20px;
+  border-radius: 18px;
+  border: 3px solid rgba(255, 216, 138, 0.5);
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(255, 216, 138, 0.15),
+    rgba(3, 20, 11, 0.98)
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: center;
+}
+
+.powerup-name {
+  margin: 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #ffd88a;
+  text-transform: uppercase;
+}
+
+.powerup-description {
+  margin: 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #e4ffe9;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.powerup-price {
+  margin: 8px 0 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #ffd88a;
+  font-weight: bold;
+}
+
+.powerup-btn {
+  overflow: hidden;
+}
+
+.powerup-btn::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.powerup-btn.buy-clicked {
+  animation: buyPulse 0.45s ease;
+}
+
+.powerup-btn.buy-clicked::after {
+  animation: buyRing 0.45s ease;
+}
+
+/* BUNDLES OVERLAY */
+#bundles-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 17;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#bundles-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(2, 7, 4, 0.95),
+    rgba(0, 0, 0, 0.98)
+  );
+}
+
+.bundles-panel {
+  position: relative;
+  width: min(740px, 98vw);
+  padding: 40px 48px 56px;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(86, 255, 141, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 100%,
+      rgba(9, 66, 33, 0.85),
+      rgba(1, 7, 3, 0.96)
+    );
+  border-radius: 22px;
+  border: 3px solid rgba(86, 255, 141, 0.45);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.9),
+    inset 0 0 26px rgba(0, 0, 0, 0.85);
+  text-align: center;
+  z-index: 1;
+  pointer-events: all;
+  animation: slideIn 0.3s ease-out;
+  max-height: 150vh;
+  overflow-y: auto;
+}
+
+.bundles-panel::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(157, 255, 196, 0.35);
+  box-shadow: 0 0 30px rgba(86, 255, 141, 0.35);
+  pointer-events: none;
+}
+
+.bundles-panel h2 {
+  margin: 0 0 32px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 8px;
+  color: #f1ffee;
+  -webkit-text-stroke: 2px #06371a;
+  text-shadow:
+    0 0 18px rgba(0, 0, 0, 0.85),
+    0 0 12px rgba(86, 255, 141, 0.8);
+  text-transform: uppercase;
+}
+
+#bundles-close {
+  min-width: 200px;
+  padding: 16px 32px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #2bc066, #6bff9b);
+  color: #052712;
+  border: 3px solid #0b341b;
+  border-radius: 18px;
+  box-shadow:
+    0 20px 35px rgba(0, 0, 0, 0.65),
+    inset 0 0 14px rgba(255, 255, 255, 0.35);
+  -webkit-text-stroke: 1.5px rgba(3, 48, 24, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 24px;
+}
+
+#bundles-close:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 28px 45px rgba(0, 0, 0, 0.75),
+    inset 0 0 18px rgba(255, 255, 255, 0.45);
+  border-color: #0d4a25;
+}
+
+#bundles-close:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 16px 25px rgba(0, 0, 0, 0.8),
+    inset 0 0 14px rgba(255, 255, 255, 0.35);
+}
+
+/* BUNDLE SHOP ITEMS */
+.shop-bundles {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 0;
+  justify-content: center;
+  margin-bottom: 28px;
+  margin-top: 100px;
+  align-items: center;
+}
+
+.bundle-card {
+  width: 280px;
+  padding: 16px 14px 18px;
+  border-radius: 20px;
+  border: 3px solid rgba(138, 43, 226, 0.6);
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(138, 43, 226, 0.15),
+    rgba(3, 20, 11, 0.98)
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: center;
+}
+
+.bundle-title {
+  margin: 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #d4a5ff;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(138, 43, 226, 0.6);
+}
+
+.bundle-price {
+  margin: 3px 0 6px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #ffd88a;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 216, 138, 0.5);
+}
+
+.bundle-features {
+  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+
+.bundle-features p {
+  margin: 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: #c9f0dd;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.bundle-btn {
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.bundle-btn::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bundle-btn.buy-clicked {
+  animation: buyPulse 0.45s ease;
+}
+
+.bundle-btn.buy-clicked::after {
+  animation: buyRing 0.45s ease;
+}
+
+/* CAROUSEL STYLES */
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  margin-top: 75px;
+}
+
+.carousel-viewport {
+  width: 280px;
+  height: 380px;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.bundles-viewport {
+  height: 420px;
+}
+
+.carousel-track {
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.3s ease;
+  width: fit-content;
+  gap: 0;
+}
+
+.carousel-track .character-card,
+.carousel-track .powerup-card,
+.carousel-track .bundle-card {
+  flex: 0 0 280px;
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.carousel-btn {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #2bc066, #6bff9b);
+  color: #052712;
+  border: 3px solid #0b341b;
+  border-radius: 12px;
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.65),
+    inset 0 0 12px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.carousel-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.75),
+    inset 0 0 14px rgba(255, 255, 255, 0.4);
+}
+
+.carousel-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 8px 15px rgba(0, 0, 0, 0.8),
+    inset 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.carousel-indicators {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.carousel-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(86, 255, 141, 0.3);
+  border: 2px solid rgba(86, 255, 141, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carousel-indicator.active {
+  background: rgba(86, 255, 141, 0.8);
+  border-color: rgba(86, 255, 141, 0.9);
+  width: 12px;
+  height: 12px;
+}
+
+@keyframes carouselSlide {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
 }
