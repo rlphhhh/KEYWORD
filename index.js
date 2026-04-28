@@ -1132,9 +1132,9 @@ function getBundleExpiry(itemId) {
 
 // Helper to get bundle span in ms
 function getBundleSpanMs(itemId) {
-  if (itemId === "bundle-49") return 7 * 24 * 60 * 60 * 1000; // 1 week
-  if (itemId === "bundle-199") return 30 * 24 * 60 * 60 * 1000; // 1 month
-  if (itemId === "bundle-499") return 365 * 24 * 60 * 60 * 1000; // 1 year
+  if (itemId === "bundle-49") return 1 * 24 * 60 * 60 * 1000; // 1 day
+  if (itemId === "bundle-199") return 7 * 24 * 60 * 60 * 1000; // 7 days
+  if (itemId === "bundle-499") return 30 * 24 * 60 * 60 * 1000; // 30 days
   return 0;
 }
 
