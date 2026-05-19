@@ -258,6 +258,14 @@
         </div>
       </div>
 
+      <!-- TUTORIAL DIALOGUE BOX -->
+      <div id="tutorial-dialogue" style="display: none;">
+        <div class="tutorial-dialogue-box">
+          <p id="tutorial-text"></p>
+          <button id="tutorial-next-btn" onclick="nextTutorialStep()">NEXT</button>
+        </div>
+      </div>
+
       <button id="settings" onclick="sett()"></button>
 
       <div id="sett" onclick="if (event.target.id === 'sett') cont();">
@@ -278,11 +286,6 @@
             <div class="settings-item">
               <label>BUNDLES</label>
               <button id="bundles-open" onclick="openBundles()">OPEN</button>
-            </div>
-
-            <div class="settings-item">
-              <label>SAVE</label>
-              <button id="save-btn" onclick="saveProgress()">SAVE</button>
             </div>
           </div>
 
