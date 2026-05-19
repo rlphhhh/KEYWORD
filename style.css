@@ -58,6 +58,10 @@ body {
     0 28px 60px rgba(0, 0, 0, 0.9),
     inset 0 0 26px rgba(0, 0, 0, 0.85);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .menu-panel::before {
@@ -742,7 +746,8 @@ body {
 #audio,
 #shop-close,
 #shop-open,
-#save-btn,
+#play,
+#tutorial-close,
 .buy-btn {
   min-width: 200px;
   padding: 16px 32px;
@@ -767,7 +772,8 @@ body {
 #audio:hover,
 #shop-close:hover,
 #shop-open:hover,
-#save-btn:hover,
+#play:hover,
+#tutorial-close:hover,
 .buy-btn:hover {
   transform: translateY(-4px);
   box-shadow:
@@ -780,7 +786,8 @@ body {
 #audio:active,
 #shop-close:active,
 #shop-open:active,
-#save-btn:active,
+#play:active,
+#tutorial-close:active,
 .buy-btn:active {
   transform: translateY(2px);
   box-shadow:
@@ -1555,6 +1562,240 @@ body {
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
+}
+
+/* TUTORIAL OVERLAY */
+#tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#tutorial-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(2, 7, 4, 0.95),
+    rgba(0, 0, 0, 0.98)
+  );
+}
+
+.tutorial-panel {
+  position: relative;
+  width: min(740px, 98vw);
+  height: min(90vh, 700px);
+  padding: 40px 48px 56px;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(86, 255, 141, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 100%,
+      rgba(9, 66, 33, 0.85),
+      rgba(1, 7, 3, 0.96)
+    );
+  border-radius: 22px;
+  border: 3px solid rgba(86, 255, 141, 0.45);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.9),
+    inset 0 0 26px rgba(0, 0, 0, 0.85);
+  text-align: left;
+  z-index: 1;
+  pointer-events: all;
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.tutorial-panel h2 {
+  text-align: center;
+  color: #ffffff;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 3px;
+  margin: 0 0 24px 0;
+  text-shadow:
+    2px 2px 0px rgba(0, 0, 0, 0.5),
+    -1px -1px 0px rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.tutorial-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tutorial-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb {
+  background: rgba(86, 255, 141, 0.6);
+  border-radius: 10px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(86, 255, 141, 0.8);
+}
+
+.tutorial-section {
+  margin-bottom: 20px;
+}
+
+.tutorial-section h3 {
+  color: #56ff8d;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin: 0 0 8px 0;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+}
+
+.tutorial-section p {
+  color: #e0e0e0;
+  font-family: Arial, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 4px 0;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+#tutorial-close {
+  margin-top: 24px;
+  align-self: center;
+}
+
+/* TUTORIAL DIALOGUE BOX (IN-GAME) */
+#tutorial-dialogue {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 25;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutorial-dialogue-box {
+  position: relative;
+  width: min(600px, 90vw);
+  padding: 32px 40px;
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(43, 192, 102, 0.3),
+    rgba(3, 20, 11, 0.96)
+  );
+  border: 4px solid rgba(86, 255, 141, 0.8);
+  border-radius: 20px;
+  box-shadow:
+    0 0 40px rgba(86, 255, 141, 0.5),
+    0 20px 60px rgba(0, 0, 0, 0.9),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  z-index: 26;
+  pointer-events: all;
+  animation: slideInUp 0.4s ease-out;
+}
+
+.tutorial-dialogue-box::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 20px solid rgba(86, 255, 141, 0.8);
+  filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.3));
+}
+
+#tutorial-text {
+  color: #e0e0e0;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  line-height: 1.8;
+  margin: 0 0 24px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  text-transform: uppercase;
+}
+
+#tutorial-next-btn {
+  min-width: 180px;
+  padding: 14px 28px;
+  font-family: "Press Start 2P", system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #2bc066, #6bff9b);
+  color: #052712;
+  border: 3px solid #0b341b;
+  border-radius: 16px;
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.65),
+    inset 0 0 12px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+#tutorial-next-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.75),
+    inset 0 0 16px rgba(255, 255, 255, 0.4);
+}
+
+#tutorial-next-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.tutorial-section p {
+  color: #e0e0e0;
+  font-family: Arial, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 4px 0;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+#tutorial-close {
+  margin-top: 24px;
+  align-self: center;
+
   text-align: center;
 }
 
