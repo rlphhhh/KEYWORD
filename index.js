@@ -40,6 +40,7 @@ function play() {
   /* playAudio() */
   gameRun = true;
   p1.remove();
+  showTutorial();
 }
 
 let gameSpeed = 0;
@@ -138,7 +139,7 @@ animationStates.forEach((state, index) => {
 
 // Background
 const backgroundLayer1 = new Image();
-backgroundLayer1.src = "backgrounds/Untitled design.png";
+backgroundLayer1.src = "backgrounds/sky.png";
 const backgroundLayer2 = new Image();
 backgroundLayer2.src = "backgrounds/ulap.png";
 const backgroundLayer3 = new Image();
@@ -146,9 +147,9 @@ backgroundLayer3.src = "backgrounds/grasss.png";
 const backgroundLayer4 = new Image();
 backgroundLayer4.src = "backgrounds/bato.png";
 const backgroundLayer5 = new Image();
-backgroundLayer5.src = "backgrounds/tree.png";
+backgroundLayer5.src = "backgrounds/sinaraconcepcion.png";
 const backgroundLayer6 = new Image();
-backgroundLayer6.src = "backgrounds/sunsun.png";
+backgroundLayer6.src = "backgrounds/dadysunsunto.png";
 
 class Layer {
   constructor(image, speedModifier) {
@@ -451,8 +452,8 @@ function animate() {
       coinFrameHeight,
       coinX,
       CANVAS_HEIGHT * 0.7,
-      200,
-      200,
+      150,
+      150,
     );
   }
 
@@ -620,8 +621,8 @@ function setHint() {
   let word = levels[currentLevel].answer;
   let hint = "";
   
-  // Reveal first letter + one more for each hint used
-  let lettersToReveal = hintsUsedThisLevel + 1;
+  // Reveal first 3 letters + one more for each hint used
+  let lettersToReveal = hintsUsedThisLevel + 4;
   
   for (let i = 0; i < word.length; i++) {
     if (i < lettersToReveal) {
@@ -640,7 +641,6 @@ function useHint() {
     hintsUsedThisLevel++; // Increment hint usage for this level
     setHint(); // Reveal one more letter
     updateHintCounter();
-    saveProgress();
     showShopNotification("Hint Used!");
   } else {
     showShopNotification("No hints available!");
@@ -757,8 +757,7 @@ function closeD(btn) {
 }
 
 function closeA() {
-  // Clear saved progress completely when restarting
-  localStorage.removeItem("gameProgress");
+  // Restart the game
   game.remove();
   mis = 0;
   window.location.reload();
@@ -775,10 +774,7 @@ function resetGameProgress() {
   document.getElementById("scoreText").innerText = "0";
   coinText.innerHTML = "0";
   timer.innerHTML = "180";
-  localStorage.removeItem("gameProgress");
   updateHintCounter();
-  // Save NPC data before resetting
-  saveNPCData();
 }
 
 let settInterface = document.getElementById("sett");
@@ -1112,7 +1108,6 @@ function BUYBOOST(event) {
       timer.innerHTML = time;
     }
 
-    saveProgress();
     showShopNotification(message);
   } else {
     showShopNotification("Not enough coins");
@@ -1209,7 +1204,6 @@ function BUYBUNDLE(event) {
   purchasedBundles[itemId] = { expiry: now + spanMs };
   localStorage.setItem("purchasedBundles", JSON.stringify(purchasedBundles));
 
-  saveProgress();
   showShopNotification(message);
   updateHintCounter();
 }
@@ -1241,7 +1235,6 @@ function BUY(event) {
       }
     });
 
-    saveNPCData();
     showShopNotification("Character selected!");
     closeShop();
 
@@ -1280,7 +1273,6 @@ function BUY(event) {
       }
     });
 
-    saveNPCData();
     showShopNotification("Purchased! Character is now selected.");
     closeShop();
 
@@ -1328,7 +1320,6 @@ function SELECT_NPC(event) {
     }
   });
 
-  saveNPCData();
   showShopNotification("Character selected!");
   closeShop();
 
@@ -1338,97 +1329,7 @@ function SELECT_NPC(event) {
   }
 }
 
-// Save progress to localStorage
-function saveProgress() {
-  const progressData = {
-    coins: coins,
-    currentLevel: currentLevel,
-    score: parseInt(document.getElementById("scoreText").innerText) || 0,
-    time: time,
-    purchasedHints: purchasedHints,
-  };
-  localStorage.setItem("gameProgress", JSON.stringify(progressData));
-  saveNPCData(); // Also save NPC data
-  showShopNotification("Progress saved!");
-}
 
-// Save NPC data (persists across game resets)
-function saveNPCData() {
-  const npcData = {
-    ownedItems: Array.from(ownedItems),
-    selectedNPC: selectedNPC,
-  };
-  localStorage.setItem("npcData", JSON.stringify(npcData));
-}
-
-// Load NPC data (persists across game resets)
-function loadNPCData() {
-  const savedNPCData = localStorage.getItem("npcData");
-  if (savedNPCData) {
-    try {
-      const npcData = JSON.parse(savedNPCData);
-
-      // Restore owned items
-      if (npcData.ownedItems && Array.isArray(npcData.ownedItems)) {
-        npcData.ownedItems.forEach((itemId) => ownedItems.add(itemId));
-      }
-
-      // Restore selected NPC
-      if (npcData.selectedNPC && npcCharacters[npcData.selectedNPC]) {
-        selectedNPC = npcData.selectedNPC;
-        updateNPCImage();
-      }
-
-      // Update shop buttons - enable all for re-selection
-      const buyButtons = document.querySelectorAll(".buy-btn");
-      buyButtons.forEach((button) => {
-        const itemId = button.dataset.item;
-        if (itemId === selectedNPC) {
-          button.textContent = "SELECTED";
-          button.disabled = false;
-          button.classList.add("owned");
-        } else if (itemId && ownedItems.has(itemId)) {
-          button.textContent = "Owned";
-          button.disabled = false;
-          button.classList.add("owned");
-        } else if (itemId === "default") {
-          button.textContent = "SELECT";
-          button.disabled = false;
-        } else {
-          button.textContent = "BUY";
-          button.disabled = false;
-        }
-      });
-    } catch (error) {
-      console.error("Error loading NPC data:", error);
-    }
-  }
-}
-
-// Load progress from localStorage
-function loadProgress() {
-  const savedData = localStorage.getItem("gameProgress");
-  if (savedData) {
-    try {
-      const progressData = JSON.parse(savedData);
-      coins = progressData.coins || 0;
-      currentLevel = progressData.currentLevel || 1;
-      time = progressData.time || 180;
-      score = progressData.score || 0;
-      purchasedHints = progressData.purchasedHints || 0;
-
-      // Update UI
-      coinText.innerHTML = coins;
-      document.getElementById("scoreText").innerText = progressData.score || 0;
-      timer.innerHTML = time;
-    } catch (error) {
-      console.error("Error loading progress:", error);
-    }
-  }
-
-  // Load NPC data (owned items and selected NPC) - this persists separately
-  loadNPCData();
-}
 
 /* function playAudio(){
     myMusic.play()
@@ -1438,8 +1339,54 @@ function stopAudio(){
     myMusic.stop()
 } */
 
-// Load saved progress before starting the game
-loadProgress();
+// Tutorial functions
+let tutorialMode = false;
+let tutorialStep = 0;
+let tutorialPaused = false;
+
+const tutorialMessages = [
+  "Welcome to KEYWORD! Your dog runs on its own.",
+  "Collect coins through playing!",
+  "Use collected coins to buy HINTS, CHARACTERS, or extra TIME in the SHOP.",
+  "An NPC will appear on screen - talk to them for a clue about the word!",
+  "Type your guess for the word and press ENTER to submit.",
+  "Buy HINTS from the shop to reveal letters in the word.",
+  "You have 180 seconds to guess the word correctly. Good luck!"
+];
+
+function showTutorial() {
+  tutorialMode = true;
+  tutorialStep = 0;
+  tutorialPaused = true;
+  gameRun = true;
+  p1.remove();
+  showTutorialDialogue();
+}
+
+function showTutorialDialogue() {
+  const dialogueBox = document.getElementById("tutorial-dialogue");
+  const dialogueText = document.getElementById("tutorial-text");
+  
+  if (tutorialStep < tutorialMessages.length) {
+    dialogueText.textContent = tutorialMessages[tutorialStep];
+    dialogueBox.style.display = "flex";
+    tutorialPaused = true;
+    gameRun = false;
+  } else {
+    // Tutorial complete
+    dialogueBox.style.display = "none";
+    tutorialMode = false;
+    tutorialPaused = false;
+    gameRun = true;
+  }
+}
+
+function nextTutorialStep() {
+  tutorialStep++;
+  showTutorialDialogue();
+}
+
+// Initialize hint counter
 updateHintCounter();
 
 // call animate after everything is declared
